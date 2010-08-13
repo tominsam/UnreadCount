@@ -1,0 +1,55 @@
+<html>
+  <head>
+    <title>instapaper sparkline</title>
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load("jquery", "1.4");
+      google.setOnLoadCallback(function() {
+        
+        $.get("unread.txt", function(raw) {
+          var unread = raw.split(/[\s\n]+/).slice(-200,-1); // most recent 10 days, drop last newline
+          
+          if (unread.length < 1) {
+            return; // not worth doing
+          }
+
+          // re-parse all values as numbers. Find the maximum.
+          var max = unread[0];
+          for (var i=0; i<unread.length; i++) {
+            unread[i] = parseInt(unread[i]); // important!
+            if (unread[i] > max) {
+              max = unread[i];
+            }
+          }
+          
+          // most recent value, for the caption. Do before scaling step!
+          var last = unread[ unread.length - 1 ];
+          
+          // scale values from 0-100 (ewwww) then trim to 2 decimal places
+          for (var i=0; i<unread.length; i++) {
+            unread[i] = ("" + (100 * (unread[i] / max))).replace(/\.(..).*/, ".$1");
+          }
+
+          // http://www.style.org/chartapi/sparklines/
+          var image = "http://chart.apis.google.com/chart?";
+          image += "&cht=lc"; // line
+          image += "&chs=250x30"; // size
+          image += "&chco=0077CC"; // color
+          image += "&chls=1,1,0"; // line style
+          image += "&chm=o,990000,0," + unread.length + ",4"; // final point
+          image += "&chxt=r,x,y"; // axis labels
+          image += "&chxs=0,990000,11,0,_|1,990000,1,0,_|2,990000,1,0,_"; // label formatting
+          image += "&chxl=0:|" + last + "|1:||2:||"; // labels
+          image += "&chxp=0," + unread[ unread.length - 1 ]; // height of label
+          image += "&chd=t:" + unread.join(","); // data
+
+          $("<img>").attr("src", image).appendTo("#chart_div");
+        });
+      });
+    </script>
+  </head>
+
+  <body>
+    <div id="chart_div"></div>
+  </body>
+</html>
