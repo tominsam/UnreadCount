@@ -28,7 +28,7 @@ end
 agent = Mechanize.new
 agent.cookie_jar = jar
 
-puts "getting home"
+log "getting home"
 home = agent.get("http://instapaper.com/u")
 
 if not home.uri.to_s.match(/\/u$/)
