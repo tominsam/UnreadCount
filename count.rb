@@ -75,6 +75,10 @@ end
 
 log "total #{ unread }"
 
-puts unread
+if $config["output"]
+  File.open($config["output"], "a") {|f| f.puts unread }
+else
+  puts unread
+end
 
 

@@ -8,4 +8,7 @@ include_folders:
   - other folder
 
 # useful for debugging
-log: true  
+log: true
+
+# append unread count to this file instead of stdout
+output: "unread.txt"
