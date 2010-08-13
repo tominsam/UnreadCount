@@ -1,0 +1,11 @@
+---
+username: "usernmae"
+password: "password"
+
+# also count unread items in folders
+include_folders:
+  - economist
+  - other folder
+
+# useful for debugging
+log: true  
