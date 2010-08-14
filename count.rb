@@ -25,22 +25,34 @@ if File.exist?(cookie_jar)
   jar.load(cookie_jar);
 end
 
-agent = Mechanize.new
-agent.cookie_jar = jar
+$agent = Mechanize.new
+$agent.cookie_jar = jar
+
+def get(url)
+  begin
+    return $agent.get(url)
+  catch Error, e
+    # gratuitous
+    log "get failed. sleeping."
+    sleep 10
+    log "retrying."
+    return $agent.get(url)
+  end
+end
 
 log "getting home"
-home = agent.get("http://instapaper.com/u")
+home = get("http://instapaper.com/u")
 
 if not home.uri.to_s.match(/\/u$/)
   # if we get redirected from /u, then we're not logged in.
   log "Not logged in"
-  login = agent.get("http://www.instapaper.com/user/login")
+  login = get("http://www.instapaper.com/user/login")
   form = login.forms[0]
   form.username = $config['username']
   form.password = $config['password']
-  login = agent.submit(form)
+  login = $agent.submit(form)
 
-  home = agent.get("http://instapaper.com/u")
+  home = get("http://instapaper.com/u")
   if not home.uri.to_s.match(/\/u$/)
     log "login failed"
     exit(1)
@@ -67,7 +79,7 @@ for f in folders
     url = f.attr("href")
     if url.match(/\S/)
       log "fetching folder #{f.text} from #{url}"
-      folder = agent.get(url)
+      folder = get(url)
       unread += count(folder)
     end
   end
