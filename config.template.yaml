@@ -15,3 +15,14 @@ instapaper_folders:
 instapaper_output: "instapaper.txt"
 
 
+# imap inbox counting
+imap_server: imap.gmail.com
+imap_port: 993
+imap_ssl: true
+imap_username: username
+imap_password: password
+imap_folders: [] # not supported yet
+imap_output: "imap.txt" # write count to this file
+
+# count unread mails, or total number of mails in inbox (I file handled mail in an archive folder)
+imap_unread_only: false 

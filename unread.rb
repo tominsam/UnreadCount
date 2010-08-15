@@ -1,4 +1,6 @@
 require "yaml"
+gem 'mechanize', "~> 1.0.0"
+require 'mechanize'
 
 class Unread
   
@@ -23,10 +25,14 @@ class Unread
     return !(@config[name].nil? || !@config[name])
   end
 
-  def config(name)
+  def config(name, default = nil)
     if @config[name].nil?
-      STDERR.puts "config variable '#{name}' not found"
-      exit(1)
+      if default.nil?
+        STDERR.puts "config variable '#{name}' not found"
+        exit(1)
+      else
+        return default
+      end
     end
     return @config[name]
   end
