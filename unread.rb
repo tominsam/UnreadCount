@@ -77,7 +77,7 @@ class Unread
     begin
       return self.agent.get(url)
     rescue Exception => e
-      if e.response_code.match(/^4/)
+      if e.respond_to?(:response_code) && e.response_code.match(/^4/)
         raise
       end
       self.log "get failed (#{e}). sleeping."
