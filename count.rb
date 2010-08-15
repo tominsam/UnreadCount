@@ -31,7 +31,7 @@ $agent.cookie_jar = jar
 def get(url)
   begin
     return $agent.get(url)
-  rescue Error, e
+  rescue Exception
     # gratuitous
     log "get failed. sleeping."
     sleep 10
