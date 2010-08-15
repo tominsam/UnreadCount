@@ -34,11 +34,11 @@ class Unread
   def agent
     if @agent.nil?
       # load cookies from disk if they're there
-      cookie_jar = File.join(File.dirname($0), "cookiejar.txt")
+      @cookie_jar = File.join(File.dirname($0), "cookiejar.txt")
       @jar = Mechanize::CookieJar.new
-      if File.exist?(cookie_jar)
-        self.log "loading cookies from #{cookie_jar}"
-        @jar.load(cookie_jar);
+      if File.exist?(@cookie_jar)
+        self.log "loading cookies from #{@cookie_jar}"
+        @jar.load(@cookie_jar);
       end
 
       @agent = Mechanize.new
@@ -49,7 +49,7 @@ class Unread
   end
   
   def save_cookies
-    @jar.save_as(cookie_jar)
+    @jar.save_as(@cookie_jar)
   end
   
   def agent_get(url)
