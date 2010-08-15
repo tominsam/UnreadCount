@@ -1,0 +1,8 @@
+#!/bin/bash -e
+cd `dirname $0`
+
+./instapaper.rb
+cp instapaper.txt /home/tomi/web/movieos_generated/toys/unread/unread.txt
+
+./imap.rb
+cp imap.txt /home/tomi/web/movieos_generated/toys/unread/imap.txt
