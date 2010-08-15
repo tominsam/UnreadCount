@@ -2,95 +2,62 @@
 require 'rubygems'
 gem 'mechanize', "~> 1.0.0"
 require 'mechanize'
-require "yaml"
 
-config_file = File.join(File.dirname($0), "config.yaml")
-if !File.exist?(config_file)
-  STDERR.puts "config file missing: create #{ config_file }"
-  exit(1)
-end
-$config = YAML.load_file(config_file)
+require 'unread.rb'
 
-def log(x)
-  if $config['log']
-    STDERR.puts x
-  end
-end
+unread = Unread.new
 
-# load cookies from disk if they're there
-cookie_jar = File.join(File.dirname($0), "cookiejar.txt")
-jar = Mechanize::CookieJar.new
-if File.exist?(cookie_jar)
-  log "loading cookies from #{cookie_jar}"
-  jar.load(cookie_jar);
-end
+unread.log "getting /u.."
+home = unread.agent_get("http://instapaper.com/u")
 
-$agent = Mechanize.new
-$agent.cookie_jar = jar
-
-def get(url)
-  begin
-    return $agent.get(url)
-  rescue Exception
-    # gratuitous
-    log "get failed. sleeping."
-    sleep 10
-    log "retrying."
-    return $agent.get(url)
-  end
-end
-
-log "getting home"
-home = get("http://instapaper.com/u")
 
 if not home.uri.to_s.match(/\/u$/)
   # if we get redirected from /u, then we're not logged in.
-  log "Not logged in"
-  login = get("http://www.instapaper.com/user/login")
+  unread.log "logging in.."
+  login = unread.agent_get("http://www.instapaper.com/user/login")
   form = login.forms[0]
-  form.username = $config['username']
-  form.password = $config['password']
-  login = $agent.submit(form)
+  form.username = unread.config('instapaper_username')
+  form.password = unread.config('instapaper_password')
+  login = unread.agent.submit(form)
 
-  home = get("http://instapaper.com/u")
+  home = unread.agent_get("http://instapaper.com/u")
   if not home.uri.to_s.match(/\/u$/)
-    log "login failed"
+    STDERR.puts "login failed"
     exit(1)
   end
   
-  jar.save_as(cookie_jar)
+  unread.save_cookies
   
 end
 
-unread = 0
+total = 0
 
-
-def count(page)
-  unread = page.search("#bookmark_list")[0].search("div.tableViewCell").length
-  log "  found #{unread} unread"
-  return unread
+def count(unread, page)
+  found = page.search("#bookmark_list")[0].search("div.tableViewCell").length
+  unread.log "  found #{found} unread"
+  return found
 end
 
-unread += count(home)
+total += count(unread, home)
 
 folders = home.search("#folders a")
 for f in folders
-  if $config['include_folders'].include? f.text.downcase
+  if unread.config('instapaper_folders').include? f.text.downcase
     url = f.attr("href")
     if url.match(/\S/)
-      log "fetching folder #{f.text} from #{url}"
-      folder = get(url)
-      unread += count(folder)
+      unread.log "fetching folder #{f.text} from #{url}.."
+      folder = unread.agent_get(url)
+      total += count(unread, folder)
     end
   end
 end
 
-log "total #{ unread }"
+unread.log "total #{ total }"
 
-if $config["output"]
-  File.open($config["output"], "a") {|f| f.puts unread }
+if unread.config?("instapaper_output")
+  File.open(unread.config("instapaper_output"), "a") {|f| f.puts total }
 else
-  puts unread
+  puts total
 end
 
 

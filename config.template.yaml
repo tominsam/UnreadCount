@@ -1,14 +1,17 @@
 ---
-username: "usernmae"
-password: "password"
-
-# also count unread items in folders
-include_folders:
-  - economist
-  - other folder
-
 # useful for debugging
 log: true
 
+
+instapaper_username: username
+instapaper_password: password
+
+# also count unread items in folders
+instapaper_folders:
+  - folder
+  - another folder
+
 # append unread count to this file instead of stdout
-output: "unread.txt"
+instapaper_output: "instapaper.txt"
+
+
