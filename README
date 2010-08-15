@@ -1,7 +1,0 @@
-Awful, awful, instapaper unread item counter.
-
-copy config.template.yaml and fill it in, then run ./count.rb - it'll count unread items.
-
-I stick it in a crontab:
-
-0 * * * * ~/Github/InstapaperCount/count.rb > ~/instapaper_unread.txt
