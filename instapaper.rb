@@ -1,75 +1,63 @@
-require "yaml"
+#!/usr/bin/env ruby
+require 'rubygems'
 gem 'mechanize', "~> 1.0.0"
 require 'mechanize'
 
-class Unread
-  
-  
-  def initialize
-    
-    config_file = File.join(File.dirname($0), "config.yaml")
-    if !File.exist?(config_file)
-      STDERR.puts "config file missing: create #{ config_file }"
-      exit(1)
-    end
-    @config = YAML.load_file(config_file)
-  end
+require 'unread.rb'
 
-  def log(x)
-    if self.config?('log')
-      STDERR.puts x
-    end
-  end
-  
-  def config?(name)
-    return !(@config[name].nil? || !@config[name])
-  end
+unread = Unread.new
 
-  def config(name, default = nil)
-    if @config[name].nil?
-      if default.nil?
-        STDERR.puts "config variable '#{name}' not found"
-        exit(1)
-      else
-        return default
-      end
-    end
-    return @config[name]
-  end
-  
-  def agent
-    if @agent.nil?
-      # load cookies from disk if they're there
-      @cookie_jar = File.join(File.dirname($0), "cookiejar.txt")
-      @jar = Mechanize::CookieJar.new
-      if File.exist?(@cookie_jar)
-        self.log "loading cookies from #{@cookie_jar}"
-        @jar.load(@cookie_jar);
-      end
-
-      @agent = Mechanize.new
-      @agent.cookie_jar = @jar
-    end
-    return @agent
-
-  end
-  
-  def save_cookies
-    @jar.save_as(@cookie_jar)
-  end
-  
-  def agent_get(url)
-    # TODO - retry more than once, with back-off or something
-    begin
-      return self.agent.get(url)
-    rescue Exception => e
-      # gratuitous
-      self.log "get failed (#{e}). sleeping."
-      sleep 10
-      self.log "retrying."
-      return self.agent.get(url)
-    end
-  end
+unread.log "getting /u.."
+home = unread.agent_get("http://instapaper.com/u")
 
 
+if not home.uri.to_s.match(/\/u$/)
+  # if we get redirected from /u, then we're not logged in.
+  unread.log "logging in.."
+  login = unread.agent_get("http://www.instapaper.com/user/login")
+  form = login.forms[0]
+  form.username = unread.config('instapaper_username')
+  form.password = unread.config('instapaper_password')
+  login = unread.agent.submit(form)
+
+  home = unread.agent_get("http://instapaper.com/u")
+  if not home.uri.to_s.match(/\/u$/)
+    STDERR.puts "login failed"
+    exit(1)
+  end
+  
+  unread.save_cookies
+  
 end
+
+total = 0
+
+def count(unread, page)
+  found = page.search("#bookmark_list")[0].search("div.tableViewCell").length
+  unread.log "  found #{found} unread"
+  return found
+end
+
+total += count(unread, home)
+
+folders = home.search("#folders a")
+for f in folders
+  if unread.config('instapaper_folders').include? f.text.downcase
+    url = f.attr("href")
+    if url.match(/\S/)
+      unread.log "fetching folder #{f.text} from #{url}.."
+      folder = unread.agent_get(url)
+      total += count(unread, folder)
+    end
+  end
+end
+
+unread.log "total #{ total }"
+
+if unread.config?("instapaper_output")
+  File.open(unread.config("instapaper_output"), "a") {|f| f.puts total }
+else
+  puts total
+end
+
+
