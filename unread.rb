@@ -1,3 +1,4 @@
+require 'rubygems'
 require "yaml"
 gem 'mechanize', "~> 1.0.0"
 require 'mechanize'
@@ -13,6 +14,8 @@ class Unread
       exit(1)
     end
     @config = YAML.load_file(config_file)
+
+    @agent_headers = {}
   end
 
   def log(x)
@@ -36,7 +39,8 @@ class Unread
     end
     return @config[name]
   end
-  
+
+
   def agent
     if @agent.nil?
       # load cookies from disk if they're there
@@ -49,9 +53,19 @@ class Unread
 
       @agent = Mechanize.new
       @agent.cookie_jar = @jar
+      # http://stackoverflow.com/questions/1327495/ruby-mechanize-post-with-header
+      @agent.pre_connect_hooks << lambda { |p|
+        for k,v in @agent_headers
+          p[:request][k] = v
+        end
+      }
     end
     return @agent
 
+  end
+
+  def agent_add_header(k,v)
+    @agent_headers[k] = v
   end
   
   def save_cookies
@@ -63,12 +77,18 @@ class Unread
     begin
       return self.agent.get(url)
     rescue Exception => e
-      # gratuitous
+      if e.response_code.match(/^4/)
+        raise
+      end
       self.log "get failed (#{e}). sleeping."
       sleep 10
       self.log "retrying."
       return self.agent.get(url)
     end
+  end
+  
+  def agent_post( url, data )
+    return self.agent.post(url, data )
   end
 
 

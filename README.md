@@ -23,6 +23,10 @@ This one is actually a decent technique, though it's not battle-hardened yet. Ju
 IMAP inbox of a server you pick, though it can also just count unread items. Personally, I archive things I've dealt with,
 and my inbox is a list of 'things I have yet to do', so I like it counting everything.
 
+### reader.rb
+
+Google reader unread item counting. Uses an actual API, but it's a slightly scary reverse-engineered API. We'll see.
+
 ### unread.rb
 
 this is the library file - just a collection of general utilities that all the counters like. Logging, config
@@ -33,7 +37,7 @@ file reading, etc.
 
 * generate the google graph urls directly into the HTML rather than just writing the data, it'll be lots faster
 
-* more scripts to track more unread things. I'd like to do Google Reader unread as well, for instance.
+* more scripts to track more unread things.
 
 * The IMAP counter should be able to count unread items in folders as well, I guess. Does anyone care?
 

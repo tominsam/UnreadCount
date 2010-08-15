@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
-require 'rubygems'
+require 'unread.rb'
+
 require 'net/imap'
 
-require 'unread.rb'
 
 unread = Unread.new
 

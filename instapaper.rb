@@ -1,8 +1,4 @@
 #!/usr/bin/env ruby
-require 'rubygems'
-gem 'mechanize', "~> 1.0.0"
-require 'mechanize'
-
 require 'unread.rb'
 
 unread = Unread.new
