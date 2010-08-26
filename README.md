@@ -32,6 +32,13 @@ Google reader unread item counting. Uses an actual API, but it's a slightly scar
 this is the library file - just a collection of general utilities that all the counters like. Logging, config
 file reading, etc.
 
+## Web front-ends
+
+There's a couple of web front-ends for displaying the sparkline graphs in the `web` folder, a PHP one and a JavaScript
+one. I'm using both - the PHP one is faster and probably less finicky to make work, and it doesn't need the unread
+count text files to be in your web server directory. But the JavaScript one doesn't require any server-side smarts at
+all - you need a cronjob that can run the monitor scripts and copy the unread count files into your web server
+tree. Use or adapt the one that makes sense to you.
 
 ## TODO
 
