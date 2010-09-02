@@ -26,3 +26,9 @@ imap_output: "imap.txt" # write count to this file
 
 # count unread mails, or total number of mails in inbox (I file handled mail in an archive folder)
 imap_unread_only: false 
+
+# google reader 
+reader_username: "username"
+reader_password: "password"
+reader_output: "reader.txt"
+
