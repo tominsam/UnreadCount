@@ -13,19 +13,7 @@ function graphUrl($name) {
   global $base;
   $filename = $base . $name . ".txt";
 
-  $list = array();
-
-  $handle = fopen($filename, "r");
-  if (!$handle) {
-    return "";
-  }
-  while (!feof($handle)) {
-    $data = fgets($handle, 512); 
-    if (trim($data)) {
-      $list[] = (int)trim($data);
-    }
-  } 
-  fclose($handle); 
+  $list = file($filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
   # limit to 200 entries (about 10 days)
   if (count($list) > 200) {
