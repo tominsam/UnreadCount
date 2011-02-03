@@ -2,10 +2,8 @@
 cd `dirname $0`
 
 ./instapaper.rb
-cp instapaper.txt /home/tomi/web/movieos_generated/toys/unread/unread.txt
-
 ./imap.rb
-cp imap.txt /home/tomi/web/movieos_generated/toys/unread/imap.txt
-
 ./reader.rb
-cp reader.txt /home/tomi/web/movieos_generated/toys/unread/reader.txt
+./readitlater.rb
+
+cp *.txt /home/tomi/web/movieos_generated/toys/unread/
