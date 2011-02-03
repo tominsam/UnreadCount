@@ -1,5 +1,7 @@
 require 'rubygems'
 require "yaml"
+require "uri"
+
 gem 'mechanize', "~> 1.0.0"
 require 'mechanize'
 
@@ -72,8 +74,14 @@ class Unread
     @jar.save_as(@cookie_jar)
   end
   
-  def agent_get(url)
+  def agent_get(url, data = {})
     # TODO - retry more than once, with back-off or something
+    if data and data.keys.size > 0
+        url += "?"
+        for k,v in data
+            url += "&#{URI.escape k.to_s}=#{URI.escape v.to_s}"
+        end
+    end
     begin
       return self.agent.get(url)
     rescue Exception => e

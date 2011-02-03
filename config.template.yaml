@@ -32,3 +32,8 @@ reader_username: "username"
 reader_password: "password"
 reader_output: "reader.txt"
 
+
+readitlater_apikey: apikey
+readitlater_username: username
+readitlater_password: password
+
