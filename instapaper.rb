@@ -31,7 +31,12 @@ total = 0
 def count(unread, page)
   found = page.search("#bookmark_list")[0].search("div.tableViewCell").length
   unread.log "  found #{found} unread"
-  return found
+
+  if page.search("//a[span='Older items']").first
+    return found + count(unread, unread.agent_get(page.search("//a[span='Older items']").first.attr('href')))
+  else
+    return found
+  end
 end
 
 total += count(unread, home)
